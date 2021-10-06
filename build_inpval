@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+
+echo "Removing 'build' and 'dist' directories..."
+rm -r build dist
+echo "Removing 'inpval.spec' file..."
+rm inpval.spec
+echo "Removing binary..."
+rm /home/justin/bin/inpval
+
+pyinstaller -F inpval.py
+
+echo "Copying binary to '/home/justin/bin'..."
+cp dist/inpval "$HOME"/bin
