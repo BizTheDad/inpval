@@ -5,9 +5,11 @@ rm -r build dist
 echo "Removing 'inpval.spec' file..."
 rm inpval.spec
 echo "Removing binary..."
-rm /home/justin/bin/inpval
+rm "$HOME"/bin/inpval
 
 pyinstaller -F inpval.py
 
-echo "Copying binary to '/home/justin/bin'..."
+echo "Copying binary to '$HOME/bin'..."
 cp dist/inpval "$HOME"/bin
+echo "Copying binary to './executable"
+cp dist/inpval ./executable
