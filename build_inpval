@@ -1,5 +1,17 @@
 #!/usr/bin/env bash
 
+#
+# Run unit tests.
+#
+python3 inpval_ut.py
+exit_code=$?
+
+if [[ exit_code -gt 0 ]]
+then
+    echo "Exiting build due to unit test failure..." >> /dev/fd/2
+    exit 1
+fi
+
 echo "Removing 'build' and 'dist' directories..."
 rm -r build dist
 echo "Removing 'inpval.spec' file..."

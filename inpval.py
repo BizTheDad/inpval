@@ -1,37 +1,46 @@
-import re
-import sys
+import sys, argparse, re
+from unittest.main import main
 
-from inpval_formats import UnknownFormatError, Formats
+from inpval_formats import Formats, UnknownOptionError
 
 
-def print_all_formats():
-    for format in Formats.formats:
-        sys.stdout.write(f"{format}\n")
-
+def set_up_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog='inpval',
+        description='Test whether or not an input matches a given format. If no input is supplied then the regex pattern tied to the format is returned.',
+        usage="usage: inpval [-h] FORMAT_OPTION [INPUT]"
+    )
+    for option in Formats.options:
+        parser.add_argument(
+            option,
+            nargs="?",
+            help=f"format --> {Formats.get_option_format(option)}",
+            metavar='INPUT',
+            const='pattern'
+        )
+    return parser
 
 if __name__ == "__main__":
+    parser = set_up_parser()
+    args = parser.parse_args()
+
     try:
-        option = sys.argv[1]
-        match_against = sys.argv[2]
-        if option == '-p' or option == '--pattern':
-            try:
-                pattern = Formats.get_regex_pattern(match_against)
-                sys.stdout.write(f"{pattern}\n")
-            except IndexError:
-                sys.exit(f"inpval: Error: missing format for '{option}' option")
-            except UnknownFormatError:
-                sys.exit(f"inpval: Error: unknown format: {match_against}")
-        elif option == '-l' or option == '--list':
-            print_all_formats()
-        else:
-            try:
-                if Formats.matches_format(option, match_against):
-                    sys.stdout.write(f"{match_against}\n")
-                sys.exit(0)
-            except IndexError:
-                sys.exit("inpval: Error: missing input string")
-    except IndexError:
-        sys.exit("Usage: inpval [OPTION] [FORMAT] [INPUT]")
-    except UnknownFormatError:
-        sys.exit(f"inpval: Error: unknown format: {option}")
+        input, set_option = "", ""
+        options = vars(args)
+        for option in options:
+            input = options.get(option)
+            if input:
+                set_option = f"-{option}"
+                break
         
+        if input == 'pattern':
+            output = Formats.get_option_pattern(set_option)
+            sys.stdout.write(f"{output}\n")
+        elif Formats.matches_format(
+            set_option,
+            input
+        ):
+            sys.stdout.write(f"{input}\n")
+        sys.exit(0)
+    except UnknownOptionError:
+        sys.exit

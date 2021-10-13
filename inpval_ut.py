@@ -1,13 +1,14 @@
 import unittest
 from re import fullmatch
 
-from inpval_formats import Formats, UnknownFormatError
+from inpval_formats import Formats, UnknownOptionError
 
 
 class TestPatternMatching(unittest.TestCase):
     def test_exceptions(self):
-        with self.assertRaises(UnknownFormatError):
+        with self.assertRaises(UnknownOptionError):
             Formats.matches_format('wegw', 'input string')
+            Formats.get_option_pattern('asdf')
 
     #
     # The fragment tests will do the bounds testing. All other match testing for
@@ -67,34 +68,46 @@ class TestPatternMatching(unittest.TestCase):
         self.assertTrue(fullmatch(Formats.dt_frags['t_delims'], ' ', 0))
         self.assertFalse(fullmatch(Formats.dt_frags['t_delims'], '.', 0))
         self.assertFalse(fullmatch(Formats.dt_frags['t_delims'], '/', 0))
+        self.assertTrue(fullmatch(Formats.ip_frags['ip_255'], "0", 0))
+        self.assertTrue(fullmatch(Formats.ip_frags['ip_255'], "1", 0))
+        self.assertTrue(fullmatch(Formats.ip_frags['ip_255'], "200", 0))
+        self.assertTrue(fullmatch(Formats.ip_frags['ip_255'], "249", 0))
+        self.assertTrue(fullmatch(Formats.ip_frags['ip_255'], "255", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], "-1", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], "00", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], "000", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], "256", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], "256", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], "0001", 0))
+        self.assertFalse(fullmatch(Formats.ip_frags['ip_255'], '', 0))
 
     def test_date_4_formats(self):
-        self.assertTrue(Formats.matches_format('-date-4md', '0101'))
-        self.assertFalse(Formats.matches_format('-date-4md', '0132'))
-        self.assertTrue(Formats.matches_format('-date-4md-d', '1.23'))
-        self.assertFalse(Formats.matches_format('-date-4md-d', '1229'))
+        self.assertTrue(Formats.matches_format('-date_4md', '0101'))
+        self.assertFalse(Formats.matches_format('-date_4md', '0132'))
+        self.assertTrue(Formats.matches_format('-date_4md_d', '1.23'))
+        self.assertFalse(Formats.matches_format('-date_4md_d', '1229'))
 
     def test_date_6_formats(self):
-        self.assertTrue(Formats.matches_format('-date-6mdy', '013100'))
-        self.assertFalse(Formats.matches_format('-date-6mdy', '32434'))
-        self.assertTrue(Formats.matches_format('-date-6mdy-d', '1.23.00'))
-        self.assertFalse(Formats.matches_format('-date-6mdy-d', '122988'))
-        self.assertTrue(Formats.matches_format('-date-6dmy', '301100'))
-        self.assertFalse(Formats.matches_format('-date-6dmy', '32434'))
-        self.assertTrue(Formats.matches_format('-date-6dmy-d', '30-11.00'))
-        self.assertFalse(Formats.matches_format('-date-6dmy-d', '01-3214'))
+        self.assertTrue(Formats.matches_format('-date_6mdy', '013100'))
+        self.assertFalse(Formats.matches_format('-date_6mdy', '32434'))
+        self.assertTrue(Formats.matches_format('-date_6mdy_d', '1.23.00'))
+        self.assertFalse(Formats.matches_format('-date_6mdy_d', '122988'))
+        self.assertTrue(Formats.matches_format('-date_6dmy', '301100'))
+        self.assertFalse(Formats.matches_format('-date_6dmy', '32434'))
+        self.assertTrue(Formats.matches_format('-date_6dmy_d', '30-11.00'))
+        self.assertFalse(Formats.matches_format('-date_6dmy_d', '01-3214'))
 
     def test_date_8_formats(self):
-        self.assertTrue(Formats.matches_format('-date-8mdy', '01310001'))
-        self.assertFalse(Formats.matches_format('-date-8mdy', '01230000'))
-        self.assertTrue(Formats.matches_format('-date-8mdy-d', '10.10.1001'))
-        self.assertFalse(Formats.matches_format('-date-8mdy-d', '01/30/1'))
+        self.assertTrue(Formats.matches_format('-date_8mdy', '01310001'))
+        self.assertFalse(Formats.matches_format('-date_8mdy', '01230000'))
+        self.assertTrue(Formats.matches_format('-date_8mdy_d', '10.10.1001'))
+        self.assertFalse(Formats.matches_format('-date_8mdy_d', '01/30/1'))
 
     def test_date_9_formats(self):
-        self.assertTrue(Formats.matches_format('-date-9mdy-d', 'jan-6-2441'))
-        self.assertTrue(Formats.matches_format('-date-9mdy-d', 'feb.10.1001'))
-        self.assertFalse(Formats.matches_format('-date-9mdy-d', 'feds.6.3252'))
-        self.assertFalse(Formats.matches_format('-date-9mdy-d', 'dec.6.311'))
+        self.assertTrue(Formats.matches_format('-date_9mdy_d', 'jan-6-2441'))
+        self.assertTrue(Formats.matches_format('-date_9mdy_d', 'feb.10.1001'))
+        self.assertFalse(Formats.matches_format('-date_9mdy_d', 'feds.6.3252'))
+        self.assertFalse(Formats.matches_format('-date_9mdy_d', 'dec.6.311'))
 
     def test_word_format(self):
         self.assertTrue(Formats.matches_format('-word', 'aliugaugyLgUKyyu'))
@@ -104,14 +117,14 @@ class TestPatternMatching(unittest.TestCase):
         self.assertFalse(Formats.matches_format('-word', 'word^'))
 
     def test_time_formats(self):
-        self.assertTrue(Formats.matches_format('-time-12', '12:43 AM'))
-        self.assertFalse(Formats.matches_format('-time-12', '2:51 Ao'))
-        self.assertTrue(Formats.matches_format('-time-12-s', '12:43:45 AM'))
-        self.assertFalse(Formats.matches_format('-time-12-s', '1:25:253 P'))
-        self.assertTrue(Formats.matches_format('-time-24', '15:43'))
-        self.assertFalse(Formats.matches_format('-time-24', '24:09'))
-        self.assertTrue(Formats.matches_format('-time-24-s', '17:43:45'))
-        self.assertFalse(Formats.matches_format('-time-24-s', '09:73:13 PM'))
+        self.assertTrue(Formats.matches_format('-time_12', '12:43 AM'))
+        self.assertFalse(Formats.matches_format('-time_12', '2:51 Ao'))
+        self.assertTrue(Formats.matches_format('-time_12_s', '12:43:45 AM'))
+        self.assertFalse(Formats.matches_format('-time_12_s', '1:25:253 P'))
+        self.assertTrue(Formats.matches_format('-time_24', '15:43'))
+        self.assertFalse(Formats.matches_format('-time_24', '24:09'))
+        self.assertTrue(Formats.matches_format('-time_24_s', '17:43:45'))
+        self.assertFalse(Formats.matches_format('-time_24_s', '09:73:13 PM'))
 
     def test_email_format(self):
         self.assertTrue(Formats.matches_format('-email', 'justyhg.egife@hotmail.com'))
@@ -121,6 +134,7 @@ class TestPatternMatching(unittest.TestCase):
         self.assertFalse(Formats.matches_format('-email', 'HUGEHG.EGFUIgasdg.com'))
 
     def test_ip4_format(self):
+        self.assertTrue(Formats.matches_format('-ip4', '0.0.0.0'))
         self.assertTrue(Formats.matches_format('-ip4', '1.1.1.1'))
         self.assertTrue(Formats.matches_format('-ip4', '255.255.255.255'))
         self.assertFalse(Formats.matches_format('-ip4', '98.46.141.255:1000'))
@@ -128,6 +142,14 @@ class TestPatternMatching(unittest.TestCase):
         self.assertFalse(Formats.matches_format('-ip4', '256.0.0.1'))
         self.assertFalse(Formats.matches_format('-ip4', 'sag.14.f31t1'))
         self.assertFalse(Formats.matches_format('-ip4', '1531'))
+
+    def test_ip4_range_format(self):
+        self.assertTrue(Formats.matches_format('-ip4_range', '0.0.0.0/0'))
+        self.assertTrue(Formats.matches_format('-ip4_range', '0.0.0.0/255'))
+        self.assertFalse(Formats.matches_format('-ip4_range', '98.46.141.255:1000'))
+        self.assertFalse(Formats.matches_format('-ip4_range', '256.0.0.1'))
+        self.assertFalse(Formats.matches_format('-ip4_range', 'sag.14.f31t1'))
+        self.assertFalse(Formats.matches_format('-ip4_range', '1531'))
 
     def test_url_format(self):
         self.assertFalse(Formats.matches_format('-url', 'espn.com'))
