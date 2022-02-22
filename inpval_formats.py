@@ -156,6 +156,12 @@ class Formats:
             'format': "<Valid URL Format>",
             'pattern': r"((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-_]*)?\??(?:[\-\+=&;%@\.\w_]*)#?(?:[\.\!\/\\\w]*))?)",
             'flags': 0
+        },
+        '-pw': {
+            'notes': '',
+            'format': "minimum eight characters, at least one uppercase letter, one lowercase letter, one number and one special character (#?!@$%%^&*-)",
+            'pattern': r"(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}",
+            'flags': 0
         }
     }
 

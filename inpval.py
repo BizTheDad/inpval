@@ -1,4 +1,4 @@
-import sys, argparse, re
+import sys, argparse
 from unittest.main import main
 
 from inpval_formats import Formats, UnknownOptionError
@@ -23,10 +23,11 @@ def set_up_parser() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     parser = set_up_parser()
     args = parser.parse_args()
-
+    print(args)
     try:
         input, set_option = "", ""
         options = vars(args)
+        print(options)
         for option in options:
             input = options.get(option)
             if input:
@@ -43,4 +44,4 @@ if __name__ == "__main__":
             sys.stdout.write(f"{input}\n")
         sys.exit(0)
     except UnknownOptionError:
-        sys.exit
+        sys.exit(1)
