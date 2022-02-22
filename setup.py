@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from setuptools import setup, find_packages
+from setuptools import setup
 
 setup(
     name='inpval',
@@ -8,5 +8,7 @@ setup(
     description='Input Validation Tool',
     author='Justin Paro',
     author_email='justin.paro@gmail.com',
-    packages=find_packages(include=['inpval*'])
+    packages=['inpval'],
+    license='MIT',
+    url='https://github.com/BizTheDad/inpval'
 )
