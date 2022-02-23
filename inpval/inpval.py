@@ -23,17 +23,14 @@ def set_up_parser() -> argparse.ArgumentParser:
 if __name__ == "__main__":
     parser = set_up_parser()
     args = parser.parse_args()
-    print(args)
     try:
         input, set_option = "", ""
         options = vars(args)
-        print(options)
         for option in options:
             input = options.get(option)
             if input:
                 set_option = f"-{option}"
                 break
-        
         if input == 'pattern':
             output = Formats.get_option_pattern(set_option)
             sys.stdout.write(f"{output}\n")
